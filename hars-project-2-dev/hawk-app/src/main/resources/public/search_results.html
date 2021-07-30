@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Search Results</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
+		<style>
+		li.nav-item{
+		    padding: 0 1em;
+		    font-size: large;
+		}
+		
+		li.logout{
+		    position: absolute;
+		    right: 0;
+		}
+		
+		#imgLogo {
+			height: 40px;
+		}
+
+		#airplane {
+		  width: 50em;
+		  height: 43em;
+		  position: fixed;
+		}
+		
+		#formRow {
+		  margin-top: 5em;
+		}
+		
+		#formNav {
+		  border-bottom: 1px solid #044ea0;
+		  padding-bottom: 1em;
+		}
+		
+		#backBtn {
+			margin-top: 2em;
+			margin-bottom: 2em;
+		}
+		
+		#button {
+		  float: right;
+		  margin-top: 2em;
+		  margin-bottom: 2em;
+		}
+		
+		.resultCards {
+			margin-top: 1em;
+		}
+		
+		#resultsHeader {
+			text-align: center;
+			font-weight: 600;
+			margin-top: 1em;
+		}
+		
+		.card-title {
+			margin-top: 0.5em;
+			font-weight: 600;
+		}
+		
+		.card-header {
+			background-color: #044ea0;
+			height: 3.5em;
+		}
+		
+		.cardHeader {
+			color: white;
+			margin-top: 5px;
+			font-weight: 600;
+			margin-left: 1em;
+		}
+		
+		.departingDiv {
+			border: solid 1px grey;
+			border-radius: 5px;
+		}
+		
+		.fromIata {
+			float: left;
+			margin-left: 0.5em;
+			margin-top: 0.5em;
+			display: inline-block;
+		}
+		
+		.ariveIata {
+			float: right;
+			margin-right: 0.5em;
+			margin-top: 0.5em;
+			display: inline-block;
+		}
+		
+		.fas {
+			color: #f1726b;
+		}
+		
+		hr {
+			display: inline-block;
+			width: 13em;
+			color: #f1726b;
+		}
+		
+		.rowIn {
+			margin: auto;
+			width: 97%;
+		}
+		
+		.carInfo {
+			font-weight: 600;
+		}
+		
+		.col-6 {
+			margin-bottom: 1em;
+		}
+		
+		.departInfo {
+			border-right: 1px #044ea0 solid;
+		}
+		
+		.arriveInfo {
+			border-left: 1px #044ea0 solid;
+		}
+		
+		.departBody {
+			margin-top: 1em;
+		}
+		
+		.flightRadio {
+			color: #f1726b;
+			float: right;
+			margin-bottom: 2em;
+		}
+		
+		.grandTotal {
+			font-weight: 600;
+			float: right;
+			margin-top: 1em;
+			color: #f1726b;
+		}
+		
+		.conn {
+			margin-top: 3px;
+		}
+		
+		#buttonsDiv {
+			background-color: white;
+			border-top: 1px solid black;
+		    position: sticky;
+			bottom: 0;
+		}
+		
+		.col-5, .col-7 {
+			margin-top: 2em;
+		}
+		</style>
+
+	</head>
+	<body>
+		<!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img id="imgLogo" src="logo_no_bg.png" alt="hars_logo"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/dashboard">Current Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/airports">Book New Trip</a>
+                        </li>
+                        <li class="nav-item logout">
+                            <a class="nav-link active" aria-current="page" href="/api/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+		<!-- Raymond's Code -->
+		<div class="container">
+	        <div id="formRow" class="row">
+	        	     <div id="formNav">
+	                    <ul class="nav nav-pills nav-fill">
+	                    	<li class="nav-item">
+	                            <a class="nav-link disabled" aria-current="page" href="#">Destinations</a>
+	                        </li>
+	                        <li class="nav-item">
+	                            <a class="nav-link disabled" aria-current="page" href="#">Search Flights</a>
+	                        </li>
+	                        <li class="nav-item">
+	                            <a class="nav-link active" href="#" >Results</a>
+	                        </li>
+	                        <li class="nav-item">
+	                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Checkout</a>
+	                        </li>
+	                    </ul>
+	                </div>
+	            <div class="col-5">
+	                <!-- Page Bar -->
+	                <!-- Traveller Cards -->
+	                <h4 id="resultsHeader">Choose Flights Below</h4>
+	                <form id="form" method="GET" action="/api/price-results">
+	                <span id="spanFlights" class="traveller-cards">
+	                </span>
+	                    <!-- Button -->
+                	<div id="buttonsDiv">
+	                    <button id="backBtn" type="button" class="btn btn-primary btn-lg">Back</button>
+	                    <button id="button" type="submit" class="btn btn-primary btn-lg">Next</button>
+                    </div>
+					</form>
+	            </div>
+	            <!-- Airplane Image -->
+	            <div class="col-7">
+	                <img id="airplane" src="./airplane.png" alt="airplane">
+	            </div>
+	        </div>
+	    </div>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+		<script>
+				/* Raymond's Code */			
+			let form = document.getElementById("form");
+			
+			let spanFlights = document.getElementById("spanFlights");
+			
+			let backBtn = document.getElementById("backBtn");
+			backBtn.addEventListener("click", function() {
+				history.back();
+			});
+			
+			
+			/* Ashar's Code */
+			// var form = document.getElementById("form");
+			var ol = document.getElementById("ol");
+			var flights = null;
+			
+			//search-results?originLocationCode=IAH&destinationLocationCode=JFK&departureDate=2021-11-01&adults=1&travelClass=ECONOMY&nonStop=true&maxPrice=250
+			//search-results?originLocationCode=TPA&destinationLocationCode=LAX&departureDate=2021-07-27&returnDate=&adults=1&nonStop=true&travelClass=ECONOMY&maxPrice=500
+
+			async function search_results(query_string) {
+				var request_access = await RequestAccessToken();
+				
+				var url = "https://test.api.amadeus.com/v2/shopping/flight-offers" + query_string + "&max=10"; //
+				var access_token = request_access.access_token;
+				var response = await fetch(url, {
+					method: 'GET', 
+					headers: {
+						'Authorization': 'Bearer ' + access_token
+					}
+				});
+				var json = await response.json();
+				flights = json.data;
+				var urlParams = new URLSearchParams(window.location.search);
+				console.log(flights);
+				for (let index in flights) {
+					
+					let div1 = document.createElement("div");
+					div1.classList.add("card")
+					div1.classList.add("text-center")
+					div1.classList.add("resultCards")
+					
+					let div2 = document.createElement("div");
+					div2.classList.add("card-header");
+					
+					let cardHeader = document.createElement("h4");
+					cardHeader.classList.add("cardHeader");
+					cardHeader.innerHTML = "Flight Details";
+					
+					let radio = document.createElement("input");
+					radio.classList.add("form-check-input");
+					radio.classList.add("flightRadio");
+					radio.setAttribute("type", "radio");
+					radio.setAttribute("type", "radio");
+					radio.id = `${index}`;
+					radio.setAttribute("name", "flightSelection");
+					radio.setAttribute("value", index);
+					
+					cardHeader.appendChild(radio);
+					div2.appendChild(cardHeader);
+					div1.appendChild(div2);
+					
+					
+					let div3 = document.createElement("div");
+					div3.classList.add("card-body");
+					
+					let grand_total = flights[index].price.grandTotal;
+					let itineraries = flights[index].itineraries;
+					
+					for (let itinerary_index in itineraries) {
+						let segments = itineraries[itinerary_index].segments;
+						let total_duration = itineraries[itinerary_index].duration;
+						let departH4 = document.createElement("h4");
+						departH4.classList.add("card-title");
+						if (itinerary_index == 0) {
+							departH4.innerHTML = "Departing Flight";
+							div3.appendChild(departH4);			
+						} else {
+							departH4.innerHTML = "Returning Flight";
+							div3.appendChild(departH4);		
+						}
+						
+						
+						for (let segment_index in segments) {
+							let carrier = segments[segment_index].carrierCode;
+							let number = segments[segment_index].number;
+							let duration = segments[segment_index].duration;
+							let departure_time = segments[segment_index].departure.at;
+							let departure_iata = segments[segment_index].departure.iataCode;
+							let arrival_time = segments[segment_index].arrival.at;
+							let arrival_iata = segments[segment_index].arrival.iataCode;
+							
+							// Duration Converted
+							let newDuration = duration.slice(2);
+							let hourIdx = newDuration.indexOf("H");
+							let minIdx = newDuration.indexOf("M");
+							let hour = newDuration.substring(0, hourIdx);
+							let minute = newDuration.substring(hourIdx + 1, minIdx);
+							let trueDuration = hour + " " + "Hours and " + minute + " Minutes";
+							
+							// Departing Converted
+							let timeIdx = departure_time.indexOf("T");
+							let departDate = departure_time.substring(0, timeIdx);
+							let departMilitaryTime = departure_time.substring(timeIdx + 1);
+							
+							function convertTime(time, date) {
+								time = time.split(':');
+								let hours = Number(time[0]);
+								let minutes = Number(time[1]);
+								let seconds = Number(time[2]);
+								// calculate
+								let timeValue;
+								
+								if (hours > 0 && hours <= 12) {
+								  timeValue= "" + hours;
+								} else if (hours > 12) {
+								  timeValue= "" + (hours - 12);
+								} else if (hours == 0) {
+								  timeValue= "12";
+								}
+								timeValue += (minutes < 10) ? ":0" + minutes : ":" + minutes;  // get minutes
+								timeValue += (hours >= 12) ? " P.M." : " A.M."; 
+								date = format(date);
+								let newTime = date + " at " + timeValue;	
+								return newTime;
+							}
+							
+							let newDepart = convertTime(departMilitaryTime, departDate);
+							
+							// Arival Converted
+							let arriveTimeIdx = arrival_time.indexOf("T");
+							let arriveDate = arrival_time.substring(0, arriveTimeIdx);
+							let arriveMilitaryTime = arrival_time.substring(arriveTimeIdx + 1);
+							let newArrive = convertTime(arriveMilitaryTime, arriveDate);
+							
+							let div4 = document.createElement("div");
+							div4.classList.add("departingDiv");
+							
+							let fromIataH5 = document.createElement("h5");
+							fromIataH5.classList.add("fromIata");
+							fromIataH5.innerHTML = `${departure_iata} `;
+							
+							let iconDep = document.createElement("i");
+							iconDep.classList.add("fas");
+							iconDep.classList.add("fa-plane-departure");
+							
+							fromIataH5.appendChild(iconDep);
+							div4.appendChild(fromIataH5);
+							
+							let hr = document.createElement("hr");
+							div4.appendChild(hr);
+							
+							let ariveIataH5 = document.createElement("h5");
+							ariveIataH5.classList.add("ariveIata");
+							
+							let iconAr = document.createElement("i");
+							iconAr.classList.add("fas");
+							iconAr.classList.add("fa-plane-arrival");
+							ariveIataH5.innerHTML = `${arrival_iata} `;
+							ariveIataH5.appendChild(iconAr);
+							div4.appendChild(ariveIataH5);
+							
+							let carrierH6 = document.createElement("h6");
+							carrierH6.classList.add("departBody");
+							carrierH6.classList.add("carInfo");
+							carrierH6.innerHTML = `Carrier Information: ${carrier}${number}`;
+							div4.appendChild(carrierH6);
+							
+							let durationP = document.createElement("p");
+							durationP.classList.add("departBody");
+							durationP.innerHTML = `Duration of Flight: ${trueDuration}`;
+							div4.appendChild(durationP);
+							
+							let divRow = document.createElement("div");
+							divRow.classList.add("row");
+							divRow.classList.add("rowIn");
+							
+							let div5 = document.createElement("div");
+							div5.classList.add("col-6");
+							div5.classList.add("departInfo");
+							
+							let departP = document.createElement("p");
+							departP.classList.add("departBody");
+							departP.innerHTML = `Departing from ${departure_iata} on ${newDepart}`;
+							div5.appendChild(departP);
+							divRow.appendChild(div5);
+							
+							let div6 = document.createElement("div");
+							div6.classList.add("col-6");
+							div6.classList.add("arriveInfo");
+							
+							let ariveP = document.createElement("p");
+							ariveP.classList.add("departBody");
+							ariveP.innerHTML = `Arriving at ${arrival_iata} on ${newArrive}`;
+							div6.appendChild(ariveP);
+							divRow.appendChild(div6);
+							div4.appendChild(divRow);
+							div3.appendChild(div4);
+							
+							let indexCheck = segment_index + 1;
+							if(indexCheck <= segments.length) {
+								let connH5 = document.createElement("h5");
+								connH5.classList.add("conn");
+								connH5.innerHTML = "Connecting Flight";
+								div3.appendChild(connH5);
+							}
+						}
+					}
+					let grandH5 = document.createElement("h5");
+						grandH5.classList.add("grandTotal");
+						grandH5.innerHTML = `Grand Total: $${grand_total}`;
+						div3.appendChild(grandH5);
+						div1.appendChild(div3);
+						spanFlights.appendChild(div1);	
+				}
+			}
+			
+			function format(inputDate) {
+			    var date = new Date(inputDate);
+			    if (!isNaN(date.getTime())) {
+			        // Months use 0 index.
+			        return date.getMonth() + 1 + '/' + date.getDate() + '/' + date.getFullYear();
+			    }
+			}
+			
+			async function RequestAccessToken() {
+				var request_access = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+				    method: 'POST',
+				    body: new URLSearchParams({
+				        'grant_type': 'client_credentials',
+				        'client_id': 'OGORt5hAGLuW5GzewaxGCPFVNrKiB0WV',
+				        'client_secret': 'ik6GIT6Y7ui09KcA'
+				    })
+				});
+				var access_json = await request_access.json();
+				return access_json;
+			}
+			
+			window.onload = function () {
+				var query_string = window.location.search;
+				search_results(query_string);
+			}
+			
+			form.onsubmit = function () {
+				var value = document.querySelector('input[name="flightSelection"]:checked').value;
+				var JSON_string = JSON.stringify(flights[value]);
+				document.cookie = `flight=${JSON_string}; SameSite=None; Secure`;
+			}
+
+		</script>
+	</body>
+</html>

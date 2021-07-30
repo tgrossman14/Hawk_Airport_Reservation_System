@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	 	<meta charset="UTF-8">
+		<title>Airport Results</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<style>
+		li.nav-item{
+		    padding: 0 1em;
+		    font-size: large;
+		}
+		
+		li.logout{
+		    position: absolute;
+		    right: 0;
+		}
+		
+		#imgLogo {
+			height: 40px;
+		}
+
+		#airplane {
+		  width: 50em;
+		  height: 43em;
+		  position: fixed;
+		}
+		
+		#radios {
+		  margin: auto;
+		  margin-top: 2em;
+		  width: 60%;
+		}
+		
+		#formRow {
+		  margin-top: 5em;
+		}
+		
+		.firstRadios {
+		  margin-left: 1.5em;
+		  margin-right: 1.5em;
+		}
+		
+		.form-check-label {
+		  font-weight: 600;
+		}
+		
+		.card-header {
+		  height: 4em;
+		  text-align: center;
+		}
+		
+		#card-header {
+		  margin-top: 3px;
+		  font-weight: 600;
+		  color: white;
+		}
+		
+		#formNav {
+		  border-bottom: 1px solid #044ea0;
+		  padding-bottom: 1em;
+		}
+		
+		.tripLabel,
+		.classLabel,
+		.connLabel {
+		  color: #f1726b;
+		}
+		
+		.fromAndTo,
+		#adsAndConn,
+		#classRadios {
+		  margin-top: 2em;
+		}
+		
+		.fromAndToHeader,
+		.numOfPass,
+		#classHeader,
+		#connHeader {
+		  color: #044ea0;
+		  font-weight: 700;
+		}
+		
+		.adults {
+		  margin-top: 1.5em;
+		  width: 40%;
+		}
+		
+		.secondRadios {
+		  margin: 10px;
+		}
+		
+		.thirdRadios {
+		  margin-top: 15px;
+		}
+		
+		#button {
+		  float: right;
+		  margin-right: 2em;
+		  margin-bottom: 2em;
+		  margin-top: 2em;
+		}
+		
+		#backBtn {
+			margin-top: 2em;
+			margin-bottom: 2em;
+		}
+		
+		.col-5, .col-7 {
+			margin-top: 2em;
+		}
+
+		</style>
+
+	</head>
+	<body>
+	<!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img id="imgLogo" src="logo_no_bg.png" alt="hars_logo"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/dashboard">Current Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/airports">Book New Trip</a>
+                        </li>
+                        <li class="nav-item logout">
+                            <a class="nav-link active" aria-current="page" href="/api/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+		<!-- Content -->
+		<div class="container">
+        <div id="formRow" class="row">
+        <div id="formNav">
+                    <ul class="nav nav-pills nav-fill">
+                    	<li class="nav-item">
+                            <a class="nav-link disabled" aria-current="page" href="#">Destinations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Search Flights</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#" >Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Checkout</a>
+                        </li>
+                    </ul>
+                </div>
+            <div class="col-5">
+                <!-- Radios (One-Way and Round-Trip) -->
+                <div id="radios">
+                    <div class="form-check form-check-inline firstRadios">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                            value="option1">
+                        <label class="form-check-label tripLabel" for="inlineRadio1">One-Way</label>
+                    </div>
+                    <div class="form-check form-check-inline firstRadios">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
+                            value="option2" checked>
+                        <label class="form-check-label tripLabel" for="inlineRadio2">Round-Trip</label>
+                    </div>
+                </div>
+                <!-- Flying From and To -->
+                <form id="form" method="GET" action="/api/search-results">
+                <div class="row g-2 fromAndTo">
+                    <div class="col-md">
+                        <h5 class="fromAndToHeader">Flying From</h5>
+                      <div class="form-floating">
+                        <select class="form-select" id="originLocationCode" name="originLocationCode">
+                        	<option selected>Select Airport</option>
+                        </select>
+                        <label for="ol-current">Flying From</label>
+                      </div>
+                    </div>
+                    <div class="col-md">
+                        <h5 class="fromAndToHeader">Flying To</h5>
+                      <div class="form-floating">
+                        <select class="form-select" id="destinationLocationCode" aria-label="Floating label select example" name="destinationLocationCode">
+                          <option selected>Select Airport</option>
+                        </select>
+                        <label for="ol-destination">Flying To</label>
+                      </div>
+                    </div>
+                </div>
+                <!-- Flight Dates -->
+                <div class="row g-2 fromAndTo">
+                    <div class="col-md">
+                        <h5 class="fromAndToHeader">Departure Date</h5>
+                      <div class="form-floating">
+                        <input type="date" class="form-control" id="departureDate" name="departureDate">
+                        <label for="departureDate">Departure Date</label>
+                      </div>
+                    </div>
+                    <div id="returnDate" class="col-md">
+                        <h5 class="fromAndToHeader">Return Date</h5>
+                      <div class="form-floating">
+                        <input type="date" class="form-control" id="returnDateInput" name="returnDate">
+                        <label for="returnDate">Return Date</label>
+                      </div>
+                    </div>
+                </div>
+                <!-- Adults and Connections-->
+                <div id="adsAndConn" class="row g-2">
+                    <!-- Adults -->
+                    <div class="col-md">
+                        <h5 class="numOfPass">Number of Passengers</h5>
+                      <div class="form-floating">
+                        <input type="number" class="form-control" id="adults" name="adults" placeholder="name@example.com" value="1" min="1">
+                        <label for="adults">Adults</label>
+                      </div>
+                    </div>
+                    <!-- Connections -->
+                    <div class="col-md">
+                        <h5 id="connHeader">Flight Connection</h5>
+                        <div class="form-check form-check-inline thirdRadios">
+                            <input class="form-check-input" type="radio" id="nonStop" name="nonStop" value="true">
+                            <label class="form-check-label connLabel" for="nonStop">
+                              Non-Stop
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline thirdRadios">
+                            <input class="form-check-input" type="radio" id="connected" name="nonStop" value="false" checked>
+                            <label class="form-check-label connLabel" for="connected">
+                              Connected
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Class -->
+                <div id="classRadios" class="row g-2">
+                    <div class="col-md">
+                        <h5 id="classHeader">Class</h5>
+                       <div class="form-floating">
+                        <select class="form-select" id="travelClass" name="travelClass" aria-label="Floating label select example">
+							<option value="ECONOMY">Economy</option>
+							<option value="PREMIUM_ECONOMY">Premium Economy</option>
+							<option value="BUSINESS">Business</option>
+							<option value="FIRST">First</option>
+						</select>
+						<label for="travelClass">Select Class</label>
+					   </div>
+                    </div>
+                    <div class="col-md">
+                        <h5 class="numOfPass">Max Price</h5>
+                      <div class="form-floating">
+                        <input type="money" class="form-control" id="maxPrice" name="maxPrice" placeholder="name@example.com" value="0.00" min="0">
+                        <label for="maxPrice">Price</label>
+                      </div>
+                    </div>
+                </div>
+                    <!-- Button -->
+                    <button id="backBtn" type="button" class="btn btn-primary btn-lg">Back</button>
+                    <button id="button" type="submit" class="btn btn-primary btn-lg">Next</button>
+                </form>
+            </div>
+            <!-- Airplane Image -->
+            <div class="col-7">
+                <img id="airplane" src="./airplane.png" alt="airplane">
+            </div>
+        </div>
+    </div>
+		
+		
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+		<script>
+					/* Ashar's Date Code */
+			var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1; //January is 0!
+            var yyyy = today.getFullYear();
+             if(dd<10){
+                    dd='0'+dd
+                } 
+                if(mm<10){
+                    mm='0'+mm
+                } 
+
+            today = yyyy+'-'+mm+'-'+dd;
+			
+			// Raymond's Code
+			const oneRadio = document.getElementById("inlineRadio1");
+			const roundRadio = document.getElementById("inlineRadio2");
+			const returnDate = document.getElementById("returnDate");
+			const returnDateInput = document.getElementById("returnDateInput");
+			/* document.getElementById("departureDate").setAttribute("min", today);
+            returnDateInput.setAttribute("min", today); */
+            document.getElementById("departureDate").setAttribute("min", today);
+			document.getElementById("returnDateInput").setAttribute("min", today);
+			document.getElementById("departureDate").addEventListener("change", () => {
+				returnDateInput.setAttribute("min", document.getElementById("departureDate").value);
+			});
+
+			
+			let backBtn = document.getElementById("backBtn");
+			backBtn.addEventListener("click", function() {
+				history.back();
+			});
+			
+			oneRadio.addEventListener("click", function () {
+			  returnDate.classList.add("invisible");
+			  returnDateInput.removeAttribute("name");
+			  console.log(returnDate);
+			});
+			
+			roundRadio.addEventListener("click", function () {
+			  returnDate.classList.remove("invisible");
+			  returnDateInput.setAttribute("name", "returnDate");
+			});
+			
+			let fromSelect = document.getElementById("originLocationCode");
+			let departSelect = document.getElementById("destinationLocationCode");
+			
+			// Ashar's Code
+			var urlParams = new URLSearchParams(window.location.search);
+			/*var latitude_query = urlParams.get('latitude');*/
+			var departureCity = urlParams.get('departureCity');
+			var departureState = urlParams.get('departureState');
+			/*var longitude_query = urlParams.get('longitude');*/
+			var radius_query = urlParams.get('radius');
+			/*var destination_latitude_query = urlParams.get('destination-latitude');*/
+			var arrivalCity = urlParams.get('arrivalCity');
+			/*var destination_longitude_query = urlParams.get('destination-longitude');*/
+			var arrivalState = urlParams.get('arrivalState');
+			var destination_radius_query = urlParams.get('destination-radius')
+			
+			var form = document.getElementById("form");
+			var button = document.getElementById("button");
+			var modal = document.getElementById("myModal");
+			
+			async function latLongGoogleAPI(city, state) {
+				var url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city},+${state}&key=` + "AIzaSyD7MGumrOiKucDKRyuT_KJe1YsbZrMMcdw";
+				var response = await fetch(url);
+				var json = await response.json();
+				return json;
+			}
+
+			
+			
+			var airports = null;
+			async function AirportsNearest(city_query, state_query, radius_query, current=true) {
+				var request_access = await RequestAccessToken();
+				var latLong = await latLongGoogleAPI(city_query, state_query);
+				var latitude_query = latLong.results[0].geometry.location.lat;
+				var longitude_query = latLong.results[0].geometry.location.lng;
+
+				
+				var url = "https://test.api.amadeus.com/v1/reference-data/locations/airports?latitude=" + latitude_query + "&longitude=" + longitude_query + "&radius=" + radius_query;
+				var access_token = request_access.access_token;
+				var response = await fetch(url, {
+					method: 'GET', 
+					headers: {
+						'Authorization': 'Bearer ' + access_token
+					}
+				});
+				var json = await response.json();
+				airports = json.data;
+				console.log(airports);
+				if (current) {
+					for (let index in airports) {
+						let option = document.createElement("option");
+						//option.setAttribute("name", "originLocationCode");
+						option.setAttribute("id", `${airports[index].iataCode}`);
+						option.setAttribute("value", `${airports[index].iataCode}`);
+						option.setAttribute("for", `${airports[index].iataCode}`);
+						option.innerHTML = `${airports[index].iataCode}, ${airports[index].address.cityCode}`;
+						fromSelect.appendChild(option);
+					}
+				} else {
+					for (let index in airports) {
+						let option = document.createElement("option");
+						//option.setAttribute("name", "originLocationCode");
+						option.setAttribute("id", `${airports[index].iataCode}`);
+						option.setAttribute("value", `${airports[index].iataCode}`);
+						option.setAttribute("for", `${airports[index].iataCode}`);
+						option.innerHTML = `${airports[index].iataCode}, ${airports[index].address.cityCode}`;
+						departSelect.appendChild(option);
+					}
+				}
+			}
+			
+			async function RequestAccessToken() {
+				var request_access = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+				    method: 'POST',
+				    body: new URLSearchParams({
+				        'grant_type': 'client_credentials',
+				        'client_id': 'OGORt5hAGLuW5GzewaxGCPFVNrKiB0WV',
+				        'client_secret': 'ik6GIT6Y7ui09KcA'
+				    })
+				});
+				var access_json = await request_access.json();
+				return access_json;
+			}
+			
+			window.onload = function () {
+				AirportsNearest(departureCity, departureState, radius_query);
+				AirportsNearest(arrivalCity, arrivalState, destination_radius_query, false);
+
+			}
+		</script>
+	</body>
+</html>

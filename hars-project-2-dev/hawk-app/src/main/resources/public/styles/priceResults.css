@@ -1,0 +1,154 @@
+l#airplane {
+  width: 50em;
+  height: 43em;
+  position: fixed;
+}
+
+#formRow {
+  margin-top: 5em;
+}
+
+#formNav {
+  border-bottom: 1px solid #044ea0;
+  padding-bottom: 1em;
+}
+
+#button {
+  float: right;
+  margin-bottom: 2em;
+  margin-top: 2em;
+}
+
+.resultCards {
+	margin-top: 1em;
+}
+
+#resultsHeader {
+	text-align: center;
+	font-weight: 600;
+	margin-top: 1em;
+}
+
+.card-title {
+	margin-top: 0.5em;
+	font-weight: 600;
+}
+
+.card-header {
+	background-color: #044ea0;
+	height: 3.5em;
+}
+
+.cardHeader {
+	color: white;
+	margin-top: 5px;
+	font-weight: 600;
+	margin-left: 1em;
+}
+
+.departingDiv {
+	border: solid 1px grey;
+	border-radius: 5px;
+}
+
+.fromIata {
+	float: left;
+	margin-left: 0.5em;
+	margin-top: 0.5em;
+	display: inline-block;
+}
+
+.ariveIata {
+	float: right;
+	margin-right: 0.5em;
+	margin-top: 0.5em;
+	display: inline-block;
+}
+
+.fas {
+	color: #f1726b;
+}
+
+hr {
+	display: inline-block;
+	width: 13em;
+	color: #f1726b;
+}
+
+.rowIn {
+	margin: auto;
+	width: 97%;
+}
+
+.carInfo {
+	font-weight: 600;
+}
+
+.col-6 {
+	margin-bottom: 1em;
+}
+
+.departInfo {
+	border-right: 1px #044ea0 solid;
+}
+
+.arriveInfo {
+	border-left: 1px #044ea0 solid;
+}
+
+.departBody {
+	margin-top: 1em;
+}
+
+.flightRadio {
+	color: #f1726b;
+	float: right;
+	margin-bottom: 2em;
+}
+
+.grandTotal {
+	font-weight: 600;
+	float: right;
+	margin-top: 1em;
+	color: #f1726b;
+}
+
+.conn {
+	margin-top: 3px;
+}
+
+#checkout {
+	color: #044ea0;
+	font-weight: 800;
+	margin-top: 5px;
+	float: left;
+}
+
+.text-center {
+	margin-top: 2em;
+}
+
+.col-md {
+	margin-top: 2em;
+}
+
+.nameOnCard {
+	float: left;
+	font-weight: 700;
+	color: #044ea0;
+}
+
+#backBtn {
+	float: left;
+	margin-top: 1em;
+}
+
+#confirmBtn {
+	float: right;
+	margin-right: 25px;
+	margin-top: 1em;
+}
+
+.resultCards {
+	margin-bottom: 2em;
+}

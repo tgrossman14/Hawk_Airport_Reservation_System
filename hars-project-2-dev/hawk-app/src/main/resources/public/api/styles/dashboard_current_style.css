@@ -1,0 +1,23 @@
+img{
+	height: 40px;
+}
+
+li.nav-item{
+    padding: 0 1em;
+    font-size: large;
+}
+
+li.logout{
+    position: absolute;
+    right: 0;
+}
+
+.hidden{
+    display: none;
+}
+
+footer{
+    position: absolute;
+    bottom: 0;
+    left: 1em;
+}

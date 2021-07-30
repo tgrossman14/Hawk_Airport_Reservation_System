@@ -1,0 +1,13 @@
+li.nav-item{
+    padding: 0 1em;
+    font-size: large;
+}
+
+li.logout{
+    position: absolute;
+    right: 0;
+}
+
+#imgLogo {
+	height: 40px;
+}

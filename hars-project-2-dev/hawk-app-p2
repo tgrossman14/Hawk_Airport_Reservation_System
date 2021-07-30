@@ -1,0 +1,105 @@
+DROP TABLE IF EXISTS users CASCADE;
+
+CREATE TABLE users
+(
+   user_id          bigserial,
+   user_first_name  varchar(20)   NOT NULL,
+   user_last_name   varchar(20)   NOT NULL,
+   user_email       varchar(20)   NOT NULL,
+   user_password    varchar(20)   NOT NULL
+);
+
+-- Column user_id is associated with sequence public.users_user_id_seq
+
+ALTER TABLE users
+   ADD CONSTRAINT users_pkey
+   PRIMARY KEY (user_id);
+
+ALTER TABLE users
+   ADD CONSTRAINT users_user_email_key UNIQUE (user_email);
+
+DROP TABLE IF EXISTS reservations CASCADE;
+
+CREATE TABLE reservations
+(
+   reservation_id       bigserial,
+   reservation_user_id  bigserial,
+   reservation_json     text        NOT NULL,
+   names_json           text        NOT NULL
+);
+
+-- Column reservation_id is associated with sequence public.reservations_reservation_id_seq
+-- Column reservation_user_id is associated with sequence public.reservations_reservation_user_id_seq
+
+ALTER TABLE reservations
+   ADD CONSTRAINT reservations_pkey
+   PRIMARY KEY (reservation_id);
+
+ALTER TABLE reservations
+  ADD CONSTRAINT reservations_reservation_user_id_fkey FOREIGN KEY (reservation_user_id)
+  REFERENCES users (user_id) 
+  ON UPDATE NO ACTION
+  ON DELETE NO ACTION;
+
+DROP TABLE IF EXISTS travellers CASCADE;
+
+CREATE TABLE travellers
+(
+   traveller_id                         bigserial,
+   traveller_reservation_id             bigserial,
+   traveller_plane_seat                 varchar(20)   NOT NULL,
+   traveller_luggage                    varchar(20),
+   traveller_cabin                      varchar(30)   NOT NULL,
+   traveller_estimated_flight_duration  text          NOT NULL,
+   carrier_code                         varchar(5)    NOT NULL,
+   number                               integer       NOT NULL
+);
+
+-- Column traveller_id is associated with sequence public.travellers_traveller_id_seq
+-- Column traveller_reservation_id is associated with sequence public.travellers_traveller_reservation_id_seq
+
+ALTER TABLE travellers
+   ADD CONSTRAINT travellers_pkey
+   PRIMARY KEY (traveller_id);
+
+ALTER TABLE travellers
+  ADD CONSTRAINT travellers_traveller_reservation_id_fkey FOREIGN KEY (traveller_reservation_id)
+  REFERENCES reservations (reservation_id) 
+  ON UPDATE NO ACTION
+  ON DELETE NO ACTION;
+  
+INSERT INTO users (user_first_name,user_last_name,user_email,user_password) 
+VALUES
+  ('Tim','Thompson','tt@lakers.com','ttjerry'),
+  ('Lebron','James','kinglj@lakers.com','lebronjames'),
+  ('Bob','Jim','bobjim@lakers.com','bobjim'),
+  ('Very','Nice','notnice@lakers.com','notnice'),
+  ('hmm','nah','nah@lakers.com','verynice');
+
+INSERT INTO reservations (reservation_json,names_json) 
+VALUES
+  ('{"type":"flight-offer","id":"1","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-26","numberOfBookableSeats":7,"itineraries":[{"duration":"PT3H24M","segments":[{"departure":{"iataCode":"IAH","terminal":"A","at":"2021-07-27T07:36:00"},"arrival":{"iataCode":"LAX","terminal":"2","at":"2021-07-27T09:00:00"},"carrierCode":"DL","number":"403","aircraft":{"code":"221"},"operating":{"carrierCode":"DL"},"duration":"PT3H24M","id":"5","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT3H22M","segments":[{"departure":{"iataCode":"LAX","terminal":"2","at":"2021-07-30T17:20:00"},"arrival":{"iataCode":"IAH","terminal":"A","at":"2021-07-30T22:42:00"},"carrierCode":"DL","number":"1356","aircraft":{"code":"221"},"operating":{"carrierCode":"DL"},"duration":"PT3H22M","id":"7","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"364.08","base":"316.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"364.08"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["DL"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"364.08","base":"316.00"},"fareDetailsBySegment":[{"segmentId":"5","cabin":"ECONOMY","fareBasis":"QA0NA0MQ","brandedFare":"MAINCABIN","class":"Q","includedCheckedBags":{"quantity":0}},{"segmentId":"7","cabin":"ECONOMY","fareBasis":"TA3NA0EF","brandedFare":"MAINCABIN","class":"T","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Bob","lastName":"Jim"}],"luggage":"L","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"4","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-23","numberOfBookableSeats":9,"itineraries":[{"duration":"PT1H57M","segments":[{"departure":{"iataCode":"IAH","terminal":"C","at":"2021-07-27T10:00:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-27T11:57:00"},"carrierCode":"UA","number":"1734","aircraft":{"code":"738"},"operating":{"carrierCode":"UA"},"duration":"PT1H57M","id":"41","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H12M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-30T16:45:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-30T18:57:00"},"carrierCode":"UA","number":"6228","aircraft":{"code":"E7W"},"duration":"PT2H12M","id":"48","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"624.96","base":"536.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"624.96"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"41","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"48","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"41","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"48","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"3","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-22","numberOfBookableSeats":9,"itineraries":[{"duration":"PT2H5M","segments":[{"departure":{"iataCode":"IAH","terminal":"B","at":"2021-07-22T19:55:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-22T22:00:00"},"carrierCode":"UA","number":"6054","aircraft":{"code":"E7W"},"duration":"PT2H5M","id":"1","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H12M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-25T16:45:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-25T18:57:00"},"carrierCode":"UA","number":"6228","aircraft":{"code":"E7W"},"duration":"PT2H12M","id":"6","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"642.16","base":"552.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"642.16"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"321.08","base":"276.00"},"fareDetailsBySegment":[{"segmentId":"1","cabin":"ECONOMY","fareBasis":"WAA0AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"321.08","base":"276.00"},"fareDetailsBySegment":[{"segmentId":"1","cabin":"ECONOMY","fareBasis":"WAA0AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"3","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-22","numberOfBookableSeats":9,"itineraries":[{"duration":"PT2H5M","segments":[{"departure":{"iataCode":"IAH","terminal":"B","at":"2021-07-22T19:55:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-22T22:00:00"},"carrierCode":"UA","number":"6054","aircraft":{"code":"E7W"},"duration":"PT2H5M","id":"1","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H12M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-25T16:45:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-25T18:57:00"},"carrierCode":"UA","number":"6228","aircraft":{"code":"E7W"},"duration":"PT2H12M","id":"6","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"642.16","base":"552.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"642.16"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"321.08","base":"276.00"},"fareDetailsBySegment":[{"segmentId":"1","cabin":"ECONOMY","fareBasis":"WAA0AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"321.08","base":"276.00"},"fareDetailsBySegment":[{"segmentId":"1","cabin":"ECONOMY","fareBasis":"WAA0AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"3","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-22","numberOfBookableSeats":9,"itineraries":[{"duration":"PT2H5M","segments":[{"departure":{"iataCode":"IAH","terminal":"B","at":"2021-07-22T19:55:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-22T22:00:00"},"carrierCode":"UA","number":"6054","aircraft":{"code":"E7W"},"duration":"PT2H5M","id":"1","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H12M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-25T16:45:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-25T18:57:00"},"carrierCode":"UA","number":"6228","aircraft":{"code":"E7W"},"duration":"PT2H12M","id":"6","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"642.16","base":"552.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"642.16"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"321.08","base":"276.00"},"fareDetailsBySegment":[{"segmentId":"1","cabin":"ECONOMY","fareBasis":"WAA0AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"321.08","base":"276.00"},"fareDetailsBySegment":[{"segmentId":"1","cabin":"ECONOMY","fareBasis":"WAA0AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"1","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-24","numberOfBookableSeats":9,"itineraries":[{"duration":"PT1H57M","segments":[{"departure":{"iataCode":"IAH","terminal":"C","at":"2021-07-27T10:00:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-27T11:57:00"},"carrierCode":"UA","number":"1734","aircraft":{"code":"738"},"operating":{"carrierCode":"UA"},"duration":"PT1H57M","id":"5","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H9M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-30T11:20:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-30T13:29:00"},"carrierCode":"UA","number":"5587","aircraft":{"code":"E7W"},"duration":"PT2H9M","id":"6","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"624.96","base":"536.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"624.96"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"5","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"5","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"6","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"1","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-24","numberOfBookableSeats":9,"itineraries":[{"duration":"PT1H56M","segments":[{"departure":{"iataCode":"IAH","terminal":"B","at":"2021-07-27T14:20:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-27T16:16:00"},"carrierCode":"UA","number":"6152","aircraft":{"code":"E7W"},"duration":"PT1H56M","id":"3","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H4M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-30T06:45:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-30T08:49:00"},"carrierCode":"UA","number":"6102","aircraft":{"code":"E7W"},"duration":"PT2H4M","id":"5","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"624.96","base":"536.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"624.96"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"3","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"5","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"3","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"5","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}'),
+  ('{"type":"flight-offer","id":"1","source":"GDS","instantTicketingRequired":false,"nonHomogeneous":false,"oneWay":false,"lastTicketingDate":"2021-07-24","numberOfBookableSeats":9,"itineraries":[{"duration":"PT1H56M","segments":[{"departure":{"iataCode":"IAH","terminal":"B","at":"2021-07-27T14:20:00"},"arrival":{"iataCode":"MCI","terminal":"C","at":"2021-07-27T16:16:00"},"carrierCode":"UA","number":"6152","aircraft":{"code":"E7W"},"duration":"PT1H56M","id":"3","numberOfStops":0,"blacklistedInEU":false}]},{"duration":"PT2H4M","segments":[{"departure":{"iataCode":"MCI","terminal":"C","at":"2021-07-30T06:45:00"},"arrival":{"iataCode":"IAH","terminal":"B","at":"2021-07-30T08:49:00"},"carrierCode":"UA","number":"6102","aircraft":{"code":"E7W"},"duration":"PT2H4M","id":"5","numberOfStops":0,"blacklistedInEU":false}]}],"price":{"currency":"EUR","total":"624.96","base":"536.00","fees":[{"amount":"0.00","type":"SUPPLIER"},{"amount":"0.00","type":"TICKETING"}],"grandTotal":"624.96"},"pricingOptions":{"fareType":["PUBLISHED"],"includedCheckedBagsOnly":false},"validatingAirlineCodes":["UA"],"travelerPricings":[{"travelerId":"1","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"3","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"5","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]},{"travelerId":"2","fareOption":"STANDARD","travelerType":"ADULT","price":{"currency":"EUR","total":"312.48","base":"268.00"},"fareDetailsBySegment":[{"segmentId":"3","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}},{"segmentId":"5","cabin":"ECONOMY","fareBasis":"WAA3AKEN","brandedFare":"ECONOMY","class":"W","includedCheckedBags":{"quantity":0}}]}]}','{"passengers":[{"firstName":"Lebron","lastName":"James"},{"firstName":"Kyle","lastName":"Kuzma"}],"luggage":"XL","cabin":"ECONOMY"}');
+
+INSERT INTO travellers (traveller_plane_seat,traveller_luggage,traveller_cabin,traveller_estimated_flight_duration,carrier_code,number) 
+VALUES
+  ('18D','XL','ECONOMY','2011-01-01 00:00:00','UA',6152),
+  ('20D','XL','ECONOMY','2011-01-01 00:00:00','UA',6152),
+  ('15D','XL','ECONOMY','2011-01-01 00:00:00','UA',6102),
+  ('16D','XL','ECONOMY','2011-01-01 00:00:00','UA',6102),
+  ('15E','XL','ECONOMY','2011-01-01 00:00:00','UA',1734),
+  ('15F','XL','ECONOMY','2011-01-01 00:00:00','UA',1734),
+  ('11C','XL','ECONOMY','2011-01-01 00:00:00','UA',6228),
+  ('11D','XL','ECONOMY','2011-01-01 00:00:00','UA',6228),
+  ('15E','XL','ECONOMY','2011-01-01 00:00:00','UA',1734),
+  ('15F','XL','ECONOMY','2011-01-01 00:00:00','UA',1734),
+  ('20C','XL','ECONOMY','2011-01-01 00:00:00','UA',6152),
+  ('20D','XL','ECONOMY','2011-01-01 00:00:00','UA',6152),
+  ('12C','XL','ECONOMY','2011-01-01 00:00:00','UA',6102),
+  ('12D','XL','ECONOMY','2011-01-01 00:00:00','UA',6102);

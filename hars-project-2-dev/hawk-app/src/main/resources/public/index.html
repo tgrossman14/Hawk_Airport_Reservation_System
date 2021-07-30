@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	 <meta charset="UTF-8">
+		<title>Search Airports</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<style>
+			li.nav-item{
+			    padding: 0 1em;
+			    font-size: large;
+			}
+			
+			li.logout{
+			    position: absolute;
+			    right: 0;
+			}
+			
+			#imgLogo {
+				height: 40px;
+			}
+			
+			#airplane {
+			  width: 50em;
+			  height: 43em;
+			  position: fixed;
+			}
+			
+			#formRow {
+			  margin-top: 5em;
+			}
+			
+			#formNav {
+			  border-bottom: 1px solid #044ea0;
+			  padding-bottom: 1em;
+			}
+			
+			#button {
+			  float: right;
+			  margin-bottom: 2em;
+			  margin-top: 2em;
+			}
+			
+			.col-5, .col-7 {
+				margin-top: 2em;
+			}
+			
+			.card-header {
+				background-color: #044ea0;
+			}
+			
+			#cardHeader {
+				color: white;
+				font-weight: 700;
+				margin-top: 5px;
+				text-align: center;
+			}
+			
+			h5 {
+				color: #044ea0;
+			  	font-weight: 700;
+			  	margin-top: 1em;
+			}
+			
+			.radius {
+				text-align: center;
+			}
+			
+			#searchBtn {
+				float: right;
+				margin-top: 2em;
+			}
+			
+			.container {
+				margin-bottom: 2em;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img id="imgLogo" src="./logo_no_bg.png" alt="hars_logo"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/dashboard">Current Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/airports">Book New Trip</a>
+                        </li>
+                        <li class="nav-item logout">
+                            <a class="nav-link active" aria-current="page" href="/api/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Content -->
+		<div class="container">
+        <div id="formRow" class="row">
+		      <div id="formNav">
+	            <ul class="nav nav-pills nav-fill">
+	            	<li class="nav-item">
+	                    <a class="nav-link active" aria-current="page" href="#">Destinations</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link disabled" aria-current="page" href="#">Search Flights</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link disabled" href="#" >Results</a>
+	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Checkout</a>
+	                </li>
+	            </ul>
+	        </div>
+	        <div class="col-5">
+	        <div class="card">
+	        <div class="card-header">
+              <h4 id="cardHeader">Search for Airports</h4>
+          	</div>
+          		<div class="card-body">
+				<form method="GET" action="/api/airport-results">
+				 <div class="row g-2">
+				 <div class="col-md">
+				 	<h5 class="depts">Departure City</h5>
+				 	<div class="form-floating">
+					<input type="text" class="form-control" placeholder="Departure City" name="departureCity" id="departureCity"/>
+					<label for="departureCity">Departure City</label>
+					</div>
+				</div>
+				<div class="col-md">
+					<h5 class="depts">Departure State</h5>
+					<div class="form-floating">
+					<select class="form-select" name="departureState" id="departureState">
+						<option value="AL">Alabama</option>
+						<option value="AK">Alaska</option>
+						<option value="AZ">Arizona</option>
+						<option value="AR">Arkansas</option>
+						<option value="CA">California</option>
+						<option value="CO">Colorado</option>
+						<option value="CT">Connecticut</option>
+						<option value="DE">Delaware</option>
+						<option value="DC">District Of Columbia</option>
+						<option value="FL">Florida</option>
+						<option value="GA">Georgia</option>
+						<option value="HI">Hawaii</option>
+						<option value="ID">Idaho</option>
+						<option value="IL">Illinois</option>
+						<option value="IN">Indiana</option>
+						<option value="IA">Iowa</option>
+						<option value="KS">Kansas</option>
+						<option value="KY">Kentucky</option>
+						<option value="LA">Louisiana</option>
+						<option value="ME">Maine</option>
+						<option value="MD">Maryland</option>
+						<option value="MA">Massachusetts</option>
+						<option value="MI">Michigan</option>
+						<option value="MN">Minnesota</option>
+						<option value="MS">Mississippi</option>
+						<option value="MO">Missouri</option>
+						<option value="MT">Montana</option>
+						<option value="NE">Nebraska</option>
+						<option value="NV">Nevada</option>
+						<option value="NH">New Hampshire</option>
+						<option value="NJ">New Jersey</option>
+						<option value="NM">New Mexico</option>
+						<option value="NY">New York</option>
+						<option value="NC">North Carolina</option>
+						<option value="ND">North Dakota</option>
+						<option value="OH">Ohio</option>
+						<option value="OK">Oklahoma</option>
+						<option value="OR">Oregon</option>
+						<option value="PA">Pennsylvania</option>
+						<option value="RI">Rhode Island</option>
+						<option value="SC">South Carolina</option>
+						<option value="SD">South Dakota</option>
+						<option value="TN">Tennessee</option>
+						<option value="TX">Texas</option>
+						<option value="UT">Utah</option>
+						<option value="VT">Vermont</option>
+						<option value="VA">Virginia</option>
+						<option value="WA">Washington</option>
+						<option value="WV">West Virginia</option>
+						<option value="WI">Wisconsin</option>
+						<option value="WY">Wyoming</option>
+					</select>
+					<label for="departureState">Departure State</label>
+					</div>
+					</div>
+				 </div>
+				 <div class="row g-2">
+				 <div class="col-md">
+					<h5 class="radius">Departure Radius (km)</h5>
+					<div class="form-floating">
+					<input type="number" class="form-control" placeholder="Radius (km)" name="radius" id="radius" min="0" />
+					<label for="radius">Departure Radius (km)</label>
+					</div>
+				</div>
+				</div>
+					<div class="row g-2">
+					<div class="col-md">
+					<h5>Arrival City</h5>
+					<div class="form-floating">
+					<input type="text" class="form-control" placeholder="Arrival City" name="arrivalCity" id="arrivalCity" />
+					<label for="arrivalCity">Arrival City</label>
+					</div>
+					</div>
+					<div class="col-md">
+					<h5>Arrival State:</h5>
+					<div class="form-floating">
+					<select class="form-select" name="arrivalState" id="arrivalState">
+						<option value="AL">Alabama</option>
+						<option value="AK">Alaska</option>
+						<option value="AZ">Arizona</option>
+						<option value="AR">Arkansas</option>
+						<option value="CA">California</option>
+						<option value="CO">Colorado</option>
+						<option value="CT">Connecticut</option>
+						<option value="DE">Delaware</option>
+						<option value="DC">District Of Columbia</option>
+						<option value="FL">Florida</option>
+						<option value="GA">Georgia</option>
+						<option value="HI">Hawaii</option>
+						<option value="ID">Idaho</option>
+						<option value="IL">Illinois</option>
+						<option value="IN">Indiana</option>
+						<option value="IA">Iowa</option>
+						<option value="KS">Kansas</option>
+						<option value="KY">Kentucky</option>
+						<option value="LA">Louisiana</option>
+						<option value="ME">Maine</option>
+						<option value="MD">Maryland</option>
+						<option value="MA">Massachusetts</option>
+						<option value="MI">Michigan</option>
+						<option value="MN">Minnesota</option>
+						<option value="MS">Mississippi</option>
+						<option value="MO">Missouri</option>
+						<option value="MT">Montana</option>
+						<option value="NE">Nebraska</option>
+						<option value="NV">Nevada</option>
+						<option value="NH">New Hampshire</option>
+						<option value="NJ">New Jersey</option>
+						<option value="NM">New Mexico</option>
+						<option value="NY">New York</option>
+						<option value="NC">North Carolina</option>
+						<option value="ND">North Dakota</option>
+						<option value="OH">Ohio</option>
+						<option value="OK">Oklahoma</option>
+						<option value="OR">Oregon</option>
+						<option value="PA">Pennsylvania</option>
+						<option value="RI">Rhode Island</option>
+						<option value="SC">South Carolina</option>
+						<option value="SD">South Dakota</option>
+						<option value="TN">Tennessee</option>
+						<option value="TX">Texas</option>
+						<option value="UT">Utah</option>
+						<option value="VT">Vermont</option>
+						<option value="VA">Virginia</option>
+						<option value="WA">Washington</option>
+						<option value="WV">West Virginia</option>
+						<option value="WI">Wisconsin</option>
+						<option value="WY">Wyoming</option>
+					</select>
+					<label for="arrivalState">Arrival State</label>
+					</div>
+					</div>
+					</div>
+					<div class="row g-2">
+				 	<div class="col-md">
+					<h5 class="radius">Destination Radius (km)</h5>
+					<div class="form-floating">
+					<input type="number" class="form-control" placeholder="Destination Radius" name="destination-radius" id="destination-radius" min="0" />
+					<label for="destination-radius">Destination Radius (km)</label>
+					</div>
+					</div>
+					</div>
+					<button id="searchBtn" type="submit" class="btn btn-primary btn-lg">Search</button>
+				</form>
+				</div>
+			</div>
+            </div>
+        	<!-- Airplane Image -->
+            <div class="col-7">
+                <img id="airplane" src="./airplane.png" alt="airplane">
+            </div>
+        </div>
+        </div>
+	</body>
+</html>

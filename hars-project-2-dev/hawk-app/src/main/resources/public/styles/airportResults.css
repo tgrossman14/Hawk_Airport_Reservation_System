@@ -1,0 +1,85 @@
+#airplane {
+  width: 50em;
+  height: 43em;
+  position: fixed;
+}
+
+#radios {
+  margin: auto;
+  margin-top: 2em;
+  width: 60%;
+}
+
+#formRow {
+  margin-top: 5em;
+}
+
+.firstRadios {
+  margin-left: 1.5em;
+  margin-right: 1.5em;
+}
+
+.form-check-label {
+  font-weight: 600;
+}
+
+.card-header {
+  height: 4em;
+  text-align: center;
+}
+
+#card-header {
+  margin-top: 3px;
+  font-weight: 600;
+  color: white;
+}
+
+#formNav {
+  border-bottom: 1px solid #044ea0;
+  padding-bottom: 1em;
+}
+
+.tripLabel,
+.classLabel,
+.connLabel {
+  color: #f1726b;
+}
+
+.fromAndTo,
+#adsAndConn,
+#classRadios {
+  margin-top: 2em;
+}
+
+.fromAndToHeader,
+.numOfPass,
+#classHeader,
+#connHeader {
+  color: #044ea0;
+  font-weight: 700;
+}
+
+.adults {
+  margin-top: 1.5em;
+  width: 40%;
+}
+
+.secondRadios {
+  margin: 10px;
+}
+
+.thirdRadios {
+  margin-top: 15px;
+}
+
+#button {
+  float: right;
+  margin-right: 2em;
+  margin-bottom: 2em;
+  margin-top: 2em;
+}
+
+#backBtn {
+	margin-top: 2em;
+	margin-bottom: 2em;
+}

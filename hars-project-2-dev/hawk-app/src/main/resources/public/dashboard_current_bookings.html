@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" src="./styles/dashboard_style.css">
+    <title>User Dashboard</title>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/api/dashboard"><img src="./images/logo_no_bg.png" alt="hars_logo"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/api/dashboard_current_bookings">Current Bookings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/api/dashboard_flightstatus">Flight Statuses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/api/airports">Book New Trip</a>
+                </li>
+                <li class="nav-item logout">
+                    <a class="nav-link active" aria-current="page" href="/api/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<h1>User Dashboard</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h3 class="fst-italic">Current Bookings</h3>
+            <table class="table table-hover" id="current_bookings">
+                <thead class="table-light">
+                <tr>
+                	<th scope="col">Name</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Depart</th>
+                    <th scope="col">Arrival</th>
+                    <th scope="col">Flight No.</th>
+                    <th scope="col">Seat</th>
+                    <th scope="col">Origin</th>
+                    <th scope="col">Destination</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="col">01/11/2011</th>
+                    <th scope="col">11:11</th>
+                    <th scope="col">23:11</th>
+                    <th scope="col">111</th>
+                    <th scope="col">1A</th>
+                    <th scope="col">London, UK</th>
+                    <th scope="col">Paris, FR</th>
+                </tr>
+                <tr>
+                    <th scope="col">01/11/2011</th>
+                    <th scope="col">11:11</th>
+                    <th scope="col">23:11</th>
+                    <th scope="col">111</th>
+                    <th scope="col">1A</th>
+                    <th scope="col">London, UK</th>
+                    <th scope="col">Paris, FR</th>
+                </tr>
+                <tr>
+                    <th scope="col">01/11/2011</th>
+                    <th scope="col">11:11</th>
+                    <th scope="col">23:11</th>
+                    <th scope="col">111</th>
+                    <th scope="col">1A</th>
+                    <th scope="col">London, UK</th>
+                    <th scope="col">Paris, FR</th>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <button class="btn btn-primary" type="button">Book New Flight Today!</button>
+</div>
+<script href="./scripts/dashboard_current_bookings.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

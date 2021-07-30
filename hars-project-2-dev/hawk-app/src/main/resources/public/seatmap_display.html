@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	 	<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Seatmap Display</title>
+		<style>
+			.gridsquare {
+				display: inline-table;
+				border-style: solid;
+				border-width: 3px;
+				border-color: black;
+				padding: 1%;
+			}
+			
+			.flight-map {
+				display: none;
+			}
+			img{
+				height: 40px;
+			}
+			
+			li.nav-item{
+			    padding: 0 1em;
+			    font-size: large;
+			}
+			
+			li.logout{
+			    position: absolute;
+			    right: 0;
+			}
+			
+			.hidden{
+			    display: none;
+			}
+			
+			footer{
+			    position: absolute;
+			    bottom: 0;
+			    left: 1em;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img id="imgLogo" alt="hars_logo"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/dashboard">Current Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/airports">Book New Trip</a>
+                        </li>
+                        <li class="nav-item logout">
+                            <a class="nav-link active" aria-current="page" href="/api/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+		<section id="map-section"></section>
+		
+		<script>
+			//Async function for retrieving reservation data from the reservations.json/:id route
+			async function getReservationData() {
+				// URL would be like http://localhost:5000/api/seatmap-display/5
+				var reservation_id = location.href.substring(42);
+				var url = "http://localhost:5000/api/reservations.json/" + reservation_id;
+				var response = await fetch(url);
+				var json = await response.json();
+				return json;
+			}
+			
+			//Async function for retrieving seats data from seats.json/:id route
+			async function getSeatsData() {
+				// URL would be like http://localhost:5000/api/seatmap-display/5
+				var reservation_id = location.href.substring(42);
+				var url = "http://localhost:5000/api/seats.json/" + reservation_id;
+				var response = await fetch(url);
+				var json = await response.json();
+				return json;
+			}
+			
+			//Global scope variables
+			var original_passengers = null;
+			var luggage = "";
+			var cabin = "";
+			
+			//Async function to send a POST request to the Amadeus Seatmap Display API, calls all the other async functions for their return values
+			async function SeatmapDisplay() {
+				var request_access = await RequestAccessToken();
+				var reservation_data = await getReservationData();
+				var taken_seats = await getSeatsData();
+				
+				var names = await JSON.parse(reservation_data.namesJSON);
+				luggage = names.luggage;
+				cabin = names.cabin;
+				
+				var flight_search_offer = await JSON.parse(reservation_data.reservationJSON);
+				flight_search_offer.disablePricing = true;
+				flight_search_offer.paymentCardRequired = false;
+				//Set up the request body that will be sent with the POST request
+				var flight_seatmap_display = {
+					"data": [flight_search_offer]
+				};
+				
+				//Fetch from the Amadeus API with the request body
+				var url = "https://test.api.amadeus.com/v1/shopping/seatmaps";
+				var access_token = request_access.access_token;
+				var response = await fetch(url, {
+					method: 'POST', 
+					headers: {
+						'Authorization': 'Bearer ' + access_token,
+						'Content-Type': 'application/json'
+					}, 
+					body: JSON.stringify(flight_seatmap_display)
+				});
+				var json = await response.json();
+				
+				//Call the display function to actually display the interactive map
+				display(json, taken_seats);
+				//Set up the first flight to show up at first
+				document.getElementById("Flight-0").style.display = "block";
+				var available_seats = document.querySelectorAll(".flight-map .available");
+				var reserved_seats = document.querySelectorAll(".flight-map .reserved");
+				var inputs = document.getElementsByClassName("book-seat-input");
+				var inputs_edit = document.getElementsByClassName("edit-seat-input");
+				var form = document.getElementById("book-seats");
+				var form_edit = document.getElementById("edit-seats");
+				//Have the edit-form's inputs be filled out on-page load
+				if (reserved_seats.length == inputs_edit.length) {
+					for (let input_index = 0; input_index < inputs_edit.length; input_index++) {
+						console.log(reserved_seats)
+						inputs_edit[input_index].setAttribute("value", `${reserved_seats[input_index].id}`);
+					}
+				}
+				//Only display the edit form if there are reserved seats, only display the brand new form if there aren't reserved seats
+				if (reserved_seats.length > 0) {
+					form.style.display = "none";
+					form_edit.style.display = "block";
+				} else {
+					form_edit.style.display = "none";
+					form.style.display = "block";
+				}
+				//For loop to set up each div's click event handler
+				for (let available_seat_index = 0; available_seat_index < available_seats.length; available_seat_index++) {
+					//Create a checked key (if the div is checked or not) and set it to false by default
+					available_seats[available_seat_index].checked = false;
+					var div_tab_id = available_seats[available_seat_index].parentElement.parentElement.id;
+					var passengers_remaining_h2 = document.querySelector(`#${div_tab_id} > h2`);
+					var passengers_remaining = parseInt(passengers_remaining_h2.innerText.substring(42));
+					available_seats[available_seat_index].addEventListener("click", () => {
+						var div_tab_id = available_seats[available_seat_index].parentElement.parentElement.id;
+						var passengers_remaining_h2 = document.querySelector(`#${div_tab_id} > h2`);
+						var available_seats_h2 = document.querySelector(`#${div_tab_id} > h2 + h2`);		
+						var passengers_remaining = parseInt(passengers_remaining_h2.innerText.substring(42));
+						var num_available_seats = parseInt(available_seats_h2.innerText.substring(27));
+						const inputFields = document.querySelectorAll("input");
+						var all_seats_chosen = false;
+						//Toggle the checked value on click
+						available_seats[available_seat_index].checked = !available_seats[available_seat_index].checked;
+						//If the seat is now checked, set it's color to orange, and decrement the num_available_seats and passengers_remaining variables
+						if (available_seats[available_seat_index].checked) {
+							available_seats[available_seat_index].style.backgroundColor = "orange";
+							for (let reserved_seat_index = 0; reserved_seat_index < reserved_seats.length; reserved_seat_index++) {
+								reserved_seats[reserved_seat_index].style.backgroundColor = "green";
+								reserved_seats[reserved_seat_index].className = "gridsquare available";
+								break;
+							}
+							document.getElementById(`${div_tab_id}_${original_passengers-passengers_remaining}`).setAttribute("value", `${available_seats[available_seat_index].id}`);
+							document.getElementById(`${div_tab_id}_${original_passengers-passengers_remaining}_edit`).setAttribute("value", `${available_seats[available_seat_index].id}`);
+							num_available_seats--;
+							passengers_remaining--;
+							passengers_remaining_h2.innerText = `Number of passengers to choose seats for: ${passengers_remaining}`;
+							available_seats_h2.innerText = `Available seats remaining: ${num_available_seats}`;
+						} else {
+							//If the seat is now unchecked, set it's color to green, increment the num_available_seats and passengers_remaining variables
+							available_seats[available_seat_index].style.backgroundColor = "green";
+							for (let reserved_seat_index = 0; reserved_seat_index < reserved_seats.length; reserved_seat_index++) {
+								reserved_seats[reserved_seat_index].style.backgroundColor = "blue";
+								reserved_seats[reserved_seat_index].className = "gridsquare reserved";
+								break;
+							}
+							num_available_seats++;
+							passengers_remaining++;
+							document.getElementById(`${div_tab_id}_${original_passengers-passengers_remaining}`).removeAttribute("value");
+							document.getElementById(`${div_tab_id}_${original_passengers-passengers_remaining}_edit`).setAttribute("value", `${reserved_seats[0].id}`);
+							passengers_remaining_h2.innerText = `Number of passengers to choose seats for: ${passengers_remaining}`;
+							available_seats_h2.innerText = `Available seats remaining: ${num_available_seats}`;
+						}
+						//Only have the book-seats-button show up if all it's inputs are filled
+						const validInputs = Array.from(inputFields).filter( input => input.value !== "");
+						var button = document.getElementById("book-seats-button")
+						if (inputFields.length === validInputs.length) {
+							button.style.display = "block";
+						} else {
+							button.style.display = "none";
+						}
+					
+					});
+				}
+			}
+			//Async function to get the access token needed for the Amadeus API
+			async function RequestAccessToken() {
+				var request_access = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+				    method: 'POST',
+				    body: new URLSearchParams({
+				        'grant_type': 'client_credentials',
+				        'client_id': 'OGORt5hAGLuW5GzewaxGCPFVNrKiB0WV',
+				        'client_secret': 'ik6GIT6Y7ui09KcA'
+				    })
+				});
+				var access_json = await request_access.json();
+				return access_json;
+			}
+			//Function to display the interactive seat map
+			function display(json, taken_seats) {
+				var flights = json.data;
+				var map_section = document.getElementById("map-section");
+				var nav = document.createElement("nav");
+				map_section.appendChild(nav);
+				var form = document.createElement("form");
+				form.setAttribute("method", "post");
+				form.id = "book-seats";
+				var reservation_id = location.href.substring(42);
+				form.setAttribute("action", `/api/book-seats/${reservation_id}`);
+				var button = document.createElement("button");
+				button.setAttribute("type", "submit");
+				button.id = "book-seats-button";
+				button.innerText = "Book seats!";
+				button.style.display = "none";
+				var form_edit = document.createElement("form");
+				form_edit.setAttribute("method", "post");
+				form_edit.id = "edit-seats";
+				form_edit.setAttribute("action", `/api/edit-seats/${reservation_id}`);
+				var button_edit = document.createElement("button");
+				button_edit.setAttribute("type", "submit");
+				button_edit.id = "edit-seats-button";
+				button_edit.innerText = "Edit seats!";
+				form_edit.appendChild(button_edit);
+				for (let flight_index in flights) {
+					var tab = document.createElement("a");
+					var flight = flights[flight_index];
+					tab.innerText = `${flight.carrierCode} ${flight.number}, ${flight.departure.iataCode} to ${flight.arrival.iataCode}`;
+					tab.setAttribute("href", `#Flight-${flight_index}`)
+					nav.appendChild(tab);
+					
+					var div_flight = document.createElement("div");
+					div_flight.setAttribute("id", `Flight-${flight_index}`);
+					div_flight.className = "flight-map";
+					var decks = json.data[flight_index].decks[0];
+					var width = decks.deckConfiguration.width - 1;
+					var length = decks.deckConfiguration.length;
+					var seats = decks.seats;
+					var carrier_code = json.data[flight_index].carrierCode;
+					var flight_number = json.data[flight_index].number;
+					var passengers_remaining_h2 = document.createElement("h2");
+					var passengers_remaining = seats[flight_index].travelerPricing.length;
+					original_passengers = passengers_remaining;
+					passengers_remaining_h2.innerText = `Number of passengers to choose seats for: ${passengers_remaining}`;
+					var available_seats_h2 = document.createElement("h2");
+					var available_seats = json.data[flight_index].availableSeatsCounters[0].value;
+					available_seats_h2.innerText = `Available seats remaining: ${available_seats}`;
+					for (var j = 0; j < passengers_remaining; j++) {
+						var input = document.createElement("input");
+						input.setAttribute("type", "text");
+						input.setAttribute("name", `${flight.carrierCode}-${flight.number}-${j}-${luggage}-${cabin}`);
+						input.id = `Flight-${flight_index}_${j}`;
+						input.className = "book-seat-input";
+						input.style.display = "none"
+						form.appendChild(input);
+						var sum = parseInt(flight_index)*parseInt(passengers_remaining) + parseInt(j);
+						var input_edit = document.createElement("input");
+						input_edit.setAttribute("type", "text");
+						if (taken_seats.length > 0) {
+							input_edit.setAttribute("name", `${flight.carrierCode}-${flight.number}-${j}-${taken_seats[sum].id}`);
+						}
+						input_edit.id = `Flight-${flight_index}_${j}_edit`;
+						input_edit.className = "edit-seat-input";
+						input_edit.style.display = "none"
+						form_edit.appendChild(input_edit);
+					}
+					var flight_carrier_number = `-${flight.number}`;					
+						
+			        for(var i = 0; i < width; i++){ 
+				        var row = document.createElement("div"); 
+				        row.className = "row"; 
+				        if (i === width/2) {
+							var empty_row = document.createElement("div"); 
+				        	empty_row.className = "row";
+				        	div_flight.appendChild(empty_row);
+						}
+				        for(var x = 0; x < length; x++){ 
+							if (i === width/2) {
+								var empty_div = document.createElement("div");
+								empty_div.className = "gridsquare";
+								empty_div.innerText = "16G";
+								empty_div.style.color = "white";
+								empty_row.appendChild(empty_div);
+							}
+							var seat_index = x*width + i;
+				            var cell = document.createElement("div"); 
+				            cell.className = "gridsquare"; 
+				            if (seats[seat_index]) {
+								var seat_number = seats[seat_index].number;
+								cell.innerText = `${seat_number}`;
+								cell.id = `${seat_number}`;
+								var availibility = seats[seat_index].travelerPricing[0].seatAvailabilityStatus;
+								if (availibility === "BLOCKED") {
+									cell.style.backgroundColor = "red";
+								} else if (availibility === "AVAILABLE") {
+									cell.style.backgroundColor = "green";
+									cell.className = "gridsquare available";
+									for (var k = 0; k < taken_seats.length; k++) {
+										var taken_seats_code = taken_seats[k].carrierCode;
+										var taken_seats_flight_number = taken_seats[k].flightNumber;
+										if (taken_seats_code == carrier_code && taken_seats_flight_number == flight_number) {
+											var taken_seat_number = taken_seats[k].planeSeat;
+											if (taken_seat_number == seat_number) {
+												cell.style.backgroundColor = "blue";
+												cell.className = "gridsquare reserved";
+											}
+										}
+									}
+								} else if (availibility === "OCCUPIED") {
+									cell.style.backgroundColor = "DarkGray";
+								}
+							} else { //removes cells that don't have a seat index
+								cell.style.display = "none";
+							}
+				            row.appendChild(cell);
+				        } 
+				        div_flight.appendChild(row); 
+			      	} 
+					
+					tab.addEventListener("click", () => {
+						var div_flights = document.getElementsByClassName("flight-map");
+						for (let div_index = 0; div_index < div_flights.length; div_index++) {
+							div_flights[div_index].style.display = "none";
+						}
+						document.getElementById(`Flight-${flight_index}`).style.display = "block";
+					});
+					div_flight.appendChild(passengers_remaining_h2);
+					div_flight.appendChild(available_seats_h2);
+					map_section.appendChild(div_flight);
+				}	
+				form.appendChild(button);
+				map_section.appendChild(form);
+				map_section.appendChild(form_edit);
+			}
+			
+			window.onload = function() {
+				SeatmapDisplay();
+			}
+		</script>
+	</body>
+</html>

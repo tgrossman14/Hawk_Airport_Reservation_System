@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	 	<meta charset="UTF-8">
+		<title>Dashboard</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<style>
+			img{
+				height: 40px;
+			}
+			
+			li.nav-item{
+			    padding: 0 1em;
+			    font-size: large;
+			}
+			
+			li.logout{
+			    position: absolute;
+			    right: 0;
+			}
+			
+			.hidden{
+			    display: none;
+			}
+			
+			footer{
+			    position: absolute;
+			    bottom: 0;
+			    left: 1em;
+			}
+			
+			body {
+			  background: #FFF;
+			}
+			
+			.page{ display: none;}
+			
+			#loading {
+			  display: flex;
+			  position: fixed;
+			  z-index: 100;
+			  width: 100%;
+			  height: 100%;
+			  background-image: url("https://i.pinimg.com/originals/61/d8/6d/61d86d2fc6bfffff058135dfdf5711ba.gif");
+			  background-size: cover;
+			  background-repeat: no-repeat;
+			  background-position: center;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="loading"></div>
+		<div class="page">
+		<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><img id="imgLogo" src="./logo_no_bg.png" alt="hars_logo"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/dashboard">Current Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/api/airports">Book New Trip</a>
+                        </li>
+                        <li class="nav-item logout">
+                            <a class="nav-link active" aria-current="page" href="/api/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+		<section id="main-section"></section>
+		<button id="show_all" disabled>Show all reservations</button>
+		<ol id="ol"></ol>
+		<script>
+			
+			var section = document.getElementById("main-section");
+			var ol = document.getElementById("ol");
+			
+			async function reservations() {
+			    var request_access = await RequestAccessToken();
+			    var access_token = request_access.access_token;
+			    var url = "http://localhost:5000/api/reservations.json";
+			    var response = await fetch(url);
+			    var json = await response.json();
+			    document.getElementById("show_all").addEventListener("click", () => {
+					var all_reservations = document.getElementsByClassName("number");
+					for (let j = 0; j < all_reservations.length; j++) {
+						all_reservations[j].style.display = "block";
+					}
+					event.target.setAttribute("disabled", "true");
+					var hide_buttons = document.getElementsByClassName("hide_others");
+					for (let k = 0; k < hide_buttons.length; k++) {
+						hide_buttons[k].setAttribute("disabled", "true");
+						hide_buttons[k].removeAttribute("disabled")
+					}
+				});
+			    
+			    for (let i = 0; i < json.length; i++) {
+			        var reservation_id = JSON.parse(json[i].id);
+			        var reservation = JSON.parse(json[i].reservationJSON);
+			        var names = JSON.parse(json[i].namesJSON);
+			        var passengers = names.passengers;
+			        var ul = document.createElement("ul");
+			        for (let k = 0; k < passengers.length; k++) {
+			            var li = document.createElement("li");
+			            li.innerText = `Passenger ${k+1} is ${passengers[k].firstName} ${passengers[k].lastName}`;
+			            ul.appendChild(li);
+			        }
+			        
+			        var li = document.createElement("li");
+			        li.className = "number";
+			        var itineraries = reservation.itineraries;
+			        var grand_total = reservation.price.grandTotal;
+			        var h3 = document.createElement("h3");
+			        var a = document.createElement("a");
+			        a.setAttribute("href", `/api/seatmap-display/${reservation_id}`);
+			        a.innerText = "Select or edit your seats here!";
+			        h3.innerText = `Grand Total $${grand_total}`;
+			        var form = document.createElement("form");
+			        form.setAttribute("method", "post");
+			        form.setAttribute("action", `/api/reservations/${reservation_id}`);
+			        var input = document.createElement("input");
+			        input.setAttribute("name", `${reservation_id}`);
+			        input.style.display = "none";
+			        var button = document.createElement("button");
+			        button.setAttribute("type", "submit");
+			        button.innerText = "Delete reservation here (50% refund)";
+			        form.appendChild(input);
+			        form.appendChild(button);
+			        li.appendChild(h3);
+			        li.appendChild(a);
+			        li.appendChild(form);
+			        
+			        var hide_button = document.createElement("button");
+		            hide_button.setAttribute('class', 'hide_others');
+		            hide_button.addEventListener("click", ()=>{
+						var all_reservations = document.getElementsByClassName("number");
+						for (let j = 0; j < all_reservations.length; j++) {
+							all_reservations[j].style.display = "none";
+						}
+						event.target.parentElement.style.display = "block";
+						document.getElementById('show_all').removeAttribute("disabled");
+						event.target.setAttribute("disabled", "true");
+					});
+					hide_button.innerText = "Hide Other Reservations";
+		        	li.appendChild(hide_button);
+		        	li.appendChild(ul);
+			        for (let itinerary_index in itineraries) {
+			            var div_itinerary = document.createElement("div");
+			            var segments = itineraries[itinerary_index].segments;
+			            var h4_duration = document.createElement("h4");
+			            var total_duration = itineraries[itinerary_index].duration;
+			            var total_hours = total_duration.split("T")[1].split("H")[0];
+			            var total_minutes = total_duration.split("H")[1].split("M")[0];
+			            if (itinerary_index == 0) {
+			                h4_duration.innerText = `Total duration to the destination: ${total_hours} hours and ${total_minutes} minutes`;
+			            } else {
+			                h4_duration.innerText = `Total duration back to arrival: ${total_hours} hours and ${total_minutes} minutes`;
+			            }
+			            div_itinerary.appendChild(h4_duration);
+			            var ol_segment = document.createElement("ol");
+			            for (let segment_index in segments) {
+			                var li_segment = document.createElement("li");
+			                var carrier = segments[segment_index].carrierCode;
+			                var number = segments[segment_index].number;
+			                var duration = segments[segment_index].duration;
+			                var duration_hours = duration.split("T")[1].split("H")[0];
+			                var duration_minutes = duration.split("H")[1].split("M")[0];
+			                var departure_time = segments[segment_index].departure.at;
+			                var departure_date = departure_time.split("T")[0];
+			                
+			                var url = `https://test.api.amadeus.com/v2/schedule/flights?carrierCode=${carrier}&flightNumber=${number}&scheduledDepartureDate=${departure_date}`;
+			                var response = await fetch(url, {
+			                    method: 'GET', 
+			                    headers: {
+			                        'Authorization': 'Bearer ' + access_token
+			                    }
+			                });
+			                var status_json = await response.json();
+			                if (status_json.errors) {
+								departure_status = "PAST FLIGHT";
+								arrival_status = "PAST FLIGHT";
+							}
+							if (status_json.data) {
+								var status_data = status_json.data[0];
+							}
+							if (status_data) {
+								departure_status = status_data.flightPoints[0].departure.timings[0].hasOwnProperty("delays") ? "DELAYED" : "ON TIME";
+								arrival_status = status_data.flightPoints[1].arrival.timings[0].hasOwnProperty("delays") ? "DELAYED" : "ON TIME";
+							}
+			
+			                var departure_iata = segments[segment_index].departure.iataCode;
+			                var arrival_time = segments[segment_index].arrival.at;
+			                var arrival_iata = segments[segment_index].arrival.iataCode;
+			                var h4 = document.createElement("h4");
+			                h4.innerText = `Carrier information: ${carrier} ${number}`;
+			                var h5 = document.createElement("h5");
+			                h5.innerText = `Duration for this flight: ${duration_hours} hours and ${duration_minutes} minutes`;
+			                var p_departure = document.createElement("p");
+			                var p_arrival = document.createElement("p");
+			                var p_departure_date = departure_time.split("T")[0];
+			                var p_departure_time = departure_time.split("T")[1];
+			                var p_arrival_date = arrival_time.split("T")[0];
+			                var p_arrival_time = arrival_time.split("T")[1];
+			                var p_departure_converted = convertTime(p_departure_time, p_departure_date);
+			                var p_arrival_converted = convertTime(p_arrival_time, p_arrival_date);
+			                p_departure.innerText = `Departing from ${departure_iata} at ${p_departure_converted}, Current status: ${departure_status}`;
+			                p_arrival.innerText = `Arriving at ${arrival_iata} at ${p_arrival_converted}, Current status: ${arrival_status}`;
+			                li_segment.appendChild(h4);
+			                li_segment.appendChild(h5);
+			                li_segment.appendChild(p_departure);
+			                li_segment.appendChild(p_arrival);
+			                ol_segment.appendChild(li_segment);
+			            }
+			            div_itinerary.appendChild(ol_segment);
+			            li.appendChild(div_itinerary);
+			        }
+			        ol.appendChild(li).setAttribute("number", i.toString());
+			    }
+			}
+			
+			async function RequestAccessToken() {
+			    var request_access = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+			        method: 'POST',
+			        body: new URLSearchParams({
+			            'grant_type': 'client_credentials',
+			            'client_id': 'OGORt5hAGLuW5GzewaxGCPFVNrKiB0WV',
+			            'client_secret': 'ik6GIT6Y7ui09KcA'
+			        })
+			    });
+			    var access_json = await request_access.json();
+			    return access_json;
+			}
+			
+			function format(inputDate) {
+			    var date = new Date(inputDate);
+			    if (!isNaN(date.getTime())) {
+			        // Months use 0 index.
+			        return date.getMonth() + 1 + '/' + date.getDate() + '/' + date.getFullYear();
+			    }
+			}
+			
+			function convertTime(time, date) {
+                time = time.split(':');
+                let hours = Number(time[0]);
+                let minutes = Number(time[1]);
+                let seconds = Number(time[2]);
+                // calculate
+                let timeValue;
+                
+                if (hours > 0 && hours <= 12) {
+                  timeValue= "" + hours;
+                } else if (hours > 12) {
+                  timeValue= "" + (hours - 12);
+                } else if (hours == 0) {
+                  timeValue= "12";
+                }
+                timeValue += (minutes < 10) ? ":0" + minutes : ":" + minutes;  // get minutes
+                timeValue += (hours >= 12) ? " P.M." : " A.M."; 
+                date = format(date);
+                let newTime = date + " at " + timeValue;    
+                return newTime;
+            }
+			
+			function hide_button(){
+			    document.querySelectorAll('button').forEach((single_button) => {
+			        single_button.addEventListener('click', () => {
+			            single_button.setAttribute('disabled', 'true')
+			            document.getElementById('show_all').setAttribute('disabled', 'false')
+			            let this_number = single_button.parentElement.getAttribute('number')
+			            document.querySelectorAll(`[number]:not([number=${this_number}])`).forEach((reservation)=>{
+			                reservation.setAttribute("class", "hidden")
+			            })
+			        })
+			    })
+			}
+			
+			function reveal_button(){
+			    document.getElementById('show_all').addEventListener('click', () => {
+			        document.querySelectorAll(`[number]`).forEach((reservation) => {
+			            reservation.removeAttribute("class")
+			        })
+			        document.querySelectorAll(`button`).forEach((button) => {
+			            button.removeAttribute('disabled')
+			        })
+			    })
+			}
+			
+		  	
+				const wait = (delay = 0) =>
+					new Promise(resolve => setTimeout(resolve, delay));
+			
+				const setVisible = (elementOrSelector, visible) => 
+			  		(typeof elementOrSelector === 'string'
+			    	? document.querySelector(elementOrSelector)
+			    	: elementOrSelector
+			  		).style.display = visible ? 'block' : 'none';
+			
+				setVisible('.page', false);
+				setVisible('#loading', true);
+			
+				document.addEventListener('DOMContentLoaded', () =>
+			  		wait(1000).then(() => {
+			    		setVisible('.page', true);
+			    		setVisible('#loading', false);
+			  	}));
+			window.onload = function() {
+			    reservations();
+			}
+		</script>
+		</div>
+	</body>
+</html>
