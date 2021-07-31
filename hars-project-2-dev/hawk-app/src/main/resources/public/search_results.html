@@ -155,10 +155,25 @@
 		.col-5, .col-7 {
 			margin-top: 2em;
 		}
+		.page{ display: none;}
+            
+            #loading {
+              display: flex;
+              position: fixed;
+              z-index: 100;
+              width: 100%;
+              height: 100%;
+              background-image: url("https://i.pinimg.com/originals/61/d8/6d/61d86d2fc6bfffff058135dfdf5711ba.gif");
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+            }
 		</style>
 
 	</head>
 	<body>
+	<div id="loading"></div>
+	<div class="page">
 		<!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #044ea0;">
             <div class="container-fluid">
@@ -423,7 +438,7 @@
 							div3.appendChild(div4);
 							
 							let indexCheck = segment_index + 1;
-							if(indexCheck <= segments.length) {
+							if(indexCheck < segments.length) {
 								let connH5 = document.createElement("h5");
 								connH5.classList.add("conn");
 								connH5.innerHTML = "Connecting Flight";
@@ -461,6 +476,24 @@
 				return access_json;
 			}
 			
+			const wait = (delay = 0) =>
+                    new Promise(resolve => setTimeout(resolve, delay));
+            
+                const setVisible = (elementOrSelector, visible) => 
+                      (typeof elementOrSelector === 'string'
+                    ? document.querySelector(elementOrSelector)
+                    : elementOrSelector
+                      ).style.display = visible ? 'block' : 'none';
+            
+                setVisible('.page', false);
+                setVisible('#loading', true);
+            
+                document.addEventListener('DOMContentLoaded', () =>
+                      wait(5000).then(() => {
+                        setVisible('.page', true);
+                        setVisible('#loading', false);
+                  }));
+                  
 			window.onload = function () {
 				var query_string = window.location.search;
 				search_results(query_string);
@@ -473,5 +506,6 @@
 			}
 
 		</script>
+		</div>
 	</body>
 </html>
